@@ -4,6 +4,8 @@
 
 Инструмент для расчёта ключевых метрик (MRR, LTV:CAC, NRR, Churn, ROMI) с возможностью сохранения и шеринга сценариев через ссылку.
 
+![Интерфейс iUnitRadar](Radar.png)
+
 ## 🚀 Особенности
 *   **Полный цикл метрик:** Расчёт MRR/ARR, Logo/Revenue Churn, GRR/NRR, CAC, LTV, Payback Period, Rule of 40 и Health Score.
 *   **Remote Sharing:** Генерация уникальных ссылок (`?calc=<uuid>`) для обмена расчётами. Снепшоты хранятся в Supabase (PostgreSQL).
