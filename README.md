@@ -1,4 +1,4 @@
-# iUnitRadar v1 — Калькулятор Unit-экономики B2B SaaS
+# iUnitRadar v1 — Калькулятор экономики B2B SaaS
 
 🔗 **Live Demo:** [https://addito-5g.github.io/iUnitRadar_v1/](https://addito-5g.github.io/iUnitRadar_v1/)
 
