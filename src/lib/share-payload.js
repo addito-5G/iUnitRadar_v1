@@ -20,7 +20,7 @@ export function parseSharedSnapshot(payload) {
     throw new Error('Пустой payload shared-расчёта.');
   }
   if (payload.appName !== APP_NAME) {
-    throw new Error('Этот shared-снимок создан не нашим калькулятором.');
+    throw new Error('Этот shared-снимок создан не iUnitRadar.');
   }
   if (payload.schemaVersion !== SHARE_SCHEMA_VERSION) {
     throw new Error(`Неподдерживаемая версия shared-схемы: ${payload.schemaVersion}.`);

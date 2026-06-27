@@ -111,7 +111,7 @@ export function createSeedMonths() {
       connectedCabinetsCount: 3,
       activeDaysForActivation: 9,
       activationThresholdPassed: true,
-      notes: 'Сентябрь — запуск новой когорты WB-партнёров',
+      notes: 'Сентябрь — запуск когорты партнёров Wildberries',
     },
     {
       month: '2025-10',
@@ -156,7 +156,7 @@ export function createSeedMonths() {
       connectedCabinetsCount: 3,
       activeDaysForActivation: 8,
       activationThresholdPassed: true,
-      notes: 'Октябрь — рост GMV, первые Ozon клиенты',
+      notes: 'Октябрь — рост GMV, первые клиенты Ozon',
     },
     {
       month: '2025-11',
@@ -201,7 +201,7 @@ export function createSeedMonths() {
       connectedCabinetsCount: 4,
       activeDaysForActivation: 7,
       activationThresholdPassed: true,
-      notes: 'Ноябрь — предсезонный рост и подготовка крупных кабинетов',
+      notes: 'Ноябрь — предсезонный рост и крупные кабинеты',
     },
   ].map((item) => ({ ...item, id: createSeedId(), createdAt: now, updatedAt: now }));
 }

@@ -1,38 +1,65 @@
-# iUnitRadar v1 — Дашборд B2B SaaS
+# iUnitRadar — B2B SaaS Unit Economics Calculator
 
-🔗 **Live Demo:** [https://addito-5g.github.io/iUnitRadar_v1/](https://addito-5g.github.io/iUnitRadar_v1/)
+**Live demo:** [https://addito-5g.github.io/iUnitRadar_v1/](https://addito-5g.github.io/iUnitRadar_v1/)
 
-Инструмент для расчёта ключевых метрик (MRR, LTV:CAC, NRR, Churn, ROMI) с возможностью сохранения и шеринга сценариев через ссылку.
+Portfolio project for product analytics: model B2B SaaS unit economics end to end — MRR/ARR, retention, CAC, LTV, payback, gross margin, ROMI, Rule of 40, and a health score — with shareable scenario links.
 
-![Интерфейс iUnitRadar](Radar.png)
+**Product UI is in Russian** (Russian market). Metric names follow international conventions (MRR, NRR, LTV:CAC, etc.).
 
-## 🚀 Особенности
-*   **Полный цикл метрик:** Расчёт MRR/ARR, Logo/Revenue Churn, GRR/NRR, CAC, LTV, Payback Period, Rule of 40 и Health Score.
-*   **Remote Sharing:** Генерация уникальных ссылок (`?calc=<uuid>`) для обмена расчётами. Снепшоты хранятся в Supabase (PostgreSQL).
-*   **Модульная архитектура:** Проект написан с нуля на чистых ES Modules. Чёткое разделение бизнес-логики, UI и управления состоянием.
-*   **Buildless:** Не требует сборщиков (Webpack/Vite) для запуска и деплоя.
+![iUnitRadar dashboard](Radar.png)
 
-## 🛠 Технологии
-*   **Frontend:** Vanilla JS (ES Modules), CSS.
-*   **Backend:** Supabase (REST API + JSONB).
-*   **Deploy:** GitHub Pages.
+## Why this project exists
 
-## ⚙️ Настройка
+Built the way a PM uses product analytics in practice: turn monthly inputs into decision-ready metrics, validate data quality, compare scenarios, and share results before committing roadmap or budget decisions.
 
-1.  Создайте проект в [Supabase](https://supabase.com/) и выполните SQL-скрипт из `supabase/schema.sql`.
-2.  Заполните `config.js` своими данными:
-    ```javascript
-    window.__APP_CONFIG__ = {
-      supabaseUrl: "https://YOUR_PROJECT.supabase.co",
-      supabaseAnonKey: "YOUR_SUPABASE_ANON_KEY"
-    };
-    ```
-3.  Запустите локально: `npx serve .` или `python -m http.server 8080`.
+## Features
 
-## 📂 Структура проекта
-*   `src/lib/` — чистые функции расчётов, валидации и экспорта.
-*   `src/state/` — централизованное хранилище состояния (app-store) и работа с localStorage.
-*   `src/features/` — UI-компоненты редактора и сервис шеринга.
+- **Full metric stack:** MRR/ARR, logo & revenue churn, GRR/NRR, CAC, LTV, payback, gross margin, ROMI, Rule of 40, health score
+- **Demo scenario:** one-click load of a 3-month B2B SaaS sample (marketplace sellers context)
+- **Shareable scenarios:** unique URLs (`?calc=<uuid>`) backed by Supabase snapshots
+- **Tested calculations:** unit tests on core metric functions (`npm test`)
+- **Clean architecture:** pure calculation functions, separated UI, centralized state
+- **Buildless:** vanilla ES modules — runs on GitHub Pages without a bundler
 
-## 💡 Контекст разработки
-Проект реализован самостоятельно с нуля для замены неподдерживаемого legacy-решения. Основная цель — создание прозрачного, расширяемого инструмента с возможностью удалённого доступа к расчётам без необходимости развёртывания собственного бэкенда.
+## Tech stack
+
+- **Frontend:** Vanilla JS (ES modules), CSS
+- **Backend:** Supabase (REST API + JSONB)
+- **Deploy:** GitHub Pages
+
+## Setup
+
+1. Create a [Supabase](https://supabase.com/) project and run `supabase/schema.sql`.
+2. Copy `config.example.js` to `config.js` and add your credentials.
+3. Run locally: `npm start` or `npx serve .`
+4. Run tests: `npm test`
+
+Sharing works only when Supabase is configured. Everything else runs offline with local storage.
+
+## Security note (Supabase)
+
+The bundled `schema.sql` enables **public read/write for anonymous users** — intentional for a demo/portfolio deployment.
+
+For production you should:
+
+- add TTL or cleanup for old snapshots
+- restrict RLS policies (e.g. insert-only with rate limits, or authenticated users)
+- never store sensitive financial data in public snapshots
+
+## Methodology notes
+
+- **LTV** uses a simplified formula: `(ARPA × Gross Margin %) / Logo Churn Rate` — logo churn, not revenue churn.
+- **ROMI** in the calculator is marketing efficiency based on LTV and CAC, not classic campaign-period ROMI.
+
+See the in-app glossary (Справочник) for details and assumptions.
+
+## Project structure
+
+- `src/lib/` — calculations, validation, export, formatting
+- `src/state/` — app store and local storage
+- `src/features/` — dashboard UI, month editor, sharing
+- `tests/` — unit tests for calculation logic
+
+## Context
+
+Independent rebuild of a unit economics workflow: transparent formulas, editable thresholds, import/export, and remote sharing without a custom backend.

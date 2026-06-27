@@ -2,16 +2,16 @@ export const FIELD_GROUPS = [
   {
     id: 'customers',
     title: 'Клиентская база и активация',
-    hint: 'Фундамент для logo churn, activation rate и CAC.',
+    hint: 'Основа для logo churn, activation rate и CAC.',
     fields: [
       ['month', 'Месяц', 'month'],
       ['customersAtStart', 'Клиентов на начало'],
       ['newSignedCustomers', 'Новых подписанных'],
       ['newPayingCustomers', 'Новых платящих', 'number', 'Из подписанных дошли до оплаты.'],
-      ['activatedCustomers', 'Активированных', 'number', 'Дошли до activation threshold.'],
+      ['activatedCustomers', 'Активированных', 'number', 'Дошли до порога активации.'],
       ['churnedCustomers', 'Ушедших клиентов'],
       ['reactivatedCustomers', 'Реактивированных клиентов'],
-      ['activePayingCustomersEnd', 'Активных плательщиков на конец', 'number', 'Можно оставить 0, тогда значение будет рассчитано автоматически.'],
+      ['activePayingCustomersEnd', 'Активных плательщиков на конец', 'number', 'Оставьте 0 — значение рассчитается автоматически.'],
       ['timeToValueDays', 'Time to Value, дней'],
       ['featureUsageCount', 'Использование ключевой функции'],
       ['connectedCabinetsCount', 'Подключённых кабинетов'],
@@ -21,7 +21,7 @@ export const FIELD_GROUPS = [
   {
     id: 'revenue',
     title: 'MRR и выручка',
-    hint: 'Основные входы для NRR, GRR, Quick Ratio и Rule of 40.',
+    hint: 'Ключевые входы для NRR, GRR, Quick Ratio и Rule of 40.',
     fields: [
       ['startingMRR', 'Starting MRR, ₽'],
       ['newMRR', 'New MRR, ₽'],
@@ -35,15 +35,15 @@ export const FIELD_GROUPS = [
       ['modulesRevenue', 'Модульная выручка, ₽'],
       ['usageBasedRevenue', 'Usage-based выручка, ₽'],
       ['discountsCreditsRefunds', 'Скидки / кредиты / рефанды, ₽'],
-      ['totalRecognizedRevenue', 'Total recognized revenue, ₽', 'number', 'Необязательное поле. Можно оставить 0 и считать автоматически.'],
-      ['totalCashIn', 'Total cash-in, ₽', 'number', 'Необязательное поле. Можно оставить 0 и считать автоматически.'],
+      ['totalRecognizedRevenue', 'Total recognized revenue, ₽', 'number', 'Необязательно. Оставьте 0 для автоматического расчёта.'],
+      ['totalCashIn', 'Total cash-in, ₽', 'number', 'Необязательно. Оставьте 0 для автоматического расчёта.'],
       ['averageBaseFee', 'Средний базовый тариф, ₽'],
     ],
   },
   {
     id: 'scale',
     title: 'Масштаб продукта',
-    hint: 'Поля помогают интерпретировать unit-экономику и sanity-check данных.',
+    hint: 'Помогает интерпретировать unit economics и проверить здравость данных.',
     fields: [
       ['activeCabinets', 'Активных кабинетов'],
       ['activeSKUs', 'Активных SKU'],
@@ -54,7 +54,7 @@ export const FIELD_GROUPS = [
   {
     id: 'costs',
     title: 'Привлечение и cost stack',
-    hint: 'Расходы разделены по слоям: acquisition, delivery, support.',
+    hint: 'Расходы по слоям: acquisition, delivery, support.',
     fields: [
       ['marketingCost', 'Маркетинг, ₽'],
       ['salesCost', 'Продажи, ₽'],
@@ -70,8 +70,8 @@ export const FIELD_GROUPS = [
   },
   {
     id: 'meta',
-    title: 'Заметки и служебные поля',
-    hint: 'Полезно для shared snapshot и чтения истории расчёта.',
+    title: 'Заметки',
+    hint: 'Контекст для shared snapshot и истории расчёта.',
     fields: [
       ['activationThresholdPassed', 'Порог активации достигнут', 'checkbox'],
       ['notes', 'Комментарий', 'textarea'],

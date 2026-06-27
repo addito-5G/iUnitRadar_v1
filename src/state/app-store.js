@@ -9,11 +9,6 @@ function sortMonths(months) {
 function createInitialState() {
   let months = loadMonths();
   const appState = loadAppState();
-  if (!months.length) {
-    months = createSeedMonths();
-    saveMonths(months);
-    saveAppState(appState);
-  }
   return {
     months: sortMonths(months),
     appState: { ...createDefaultAppState(), ...appState },
@@ -171,6 +166,15 @@ export class AppStore {
     this.state.ui.activeRemoteId = null;
     this.state.ui.remoteLoadState = 'idle';
     this.state.ui.remoteLoadMessage = '';
+    this.emit();
+  }
+
+  loadSampleScenario() {
+    const months = createSeedMonths();
+    this.state.months = sortMonths(months);
+    this.state.appState.selectedMonthId = months[months.length - 1].id;
+    this.state.ui.activeSection = 'dashboard';
+    this.persist();
     this.emit();
   }
 }

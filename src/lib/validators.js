@@ -53,7 +53,7 @@ export function validateMonth(month) {
   const push = (field, message, severity) => issues.push({ field, message, severity });
 
   if (!/^\d{4}-\d{2}$/.test(month.month)) {
-    push('month', 'Формат месяца должен быть YYYY-MM, например 2025-11.', 'error');
+    push('month', 'Формат месяца: YYYY-MM, например 2025-11.', 'error');
   }
 
   if (month.customersAtStart < 0) push('customersAtStart', 'Клиентов на начало не может быть отрицательным.', 'error');
@@ -98,7 +98,7 @@ export function validateMonth(month) {
     ['supportCost', 'Поддержка'],
     ['csmCost', 'CSM'],
     ['analystServiceCost', 'Аналитика / сервис'],
-    ['infraCloudCost', 'Инфра / Cloud'],
+    ['infraCloudCost', 'Инфра / cloud'],
     ['apiAiCost', 'API / AI'],
     ['partnerCommissions', 'Комиссии партнёров'],
   ];

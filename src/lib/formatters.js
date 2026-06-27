@@ -1,3 +1,6 @@
+const LOCALE = 'ru-RU';
+const CURRENCY = 'RUB';
+
 export function safeDivide(value, divisor) {
   if (!Number.isFinite(value) || !Number.isFinite(divisor) || divisor === 0) {
     return 0;
@@ -28,9 +31,9 @@ export function formatCurrency(value, compact = false) {
     if (abs >= 1_000) return `${round(value / 1_000, 0)}K ₽`;
     return `${round(value, 0)} ₽`;
   }
-  return new Intl.NumberFormat('ru-RU', {
+  return new Intl.NumberFormat(LOCALE, {
     style: 'currency',
-    currency: 'RUB',
+    currency: CURRENCY,
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -46,7 +49,7 @@ export function formatNumber(value, decimals = 1) {
   if (!Number.isFinite(value)) {
     return '—';
   }
-  return new Intl.NumberFormat('ru-RU', {
+  return new Intl.NumberFormat(LOCALE, {
     maximumFractionDigits: decimals,
     minimumFractionDigits: 0,
   }).format(round(value, decimals));

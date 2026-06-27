@@ -7,6 +7,14 @@ import { formatCurrency, formatMonth, formatPercent } from './lib/formatters.js'
 import { createEmptyMonth } from './lib/month-model.js';
 import { copyText, loadSharedCalculation, readCalcIdFromUrl, removeCalcIdFromUrl, saveSharedCalculation } from './features/share/share-service.js';
 
+const NAV_ITEMS = [
+  ['dashboard', 'Обзор'],
+  ['months', 'Месяцы'],
+  ['share', 'Поделиться'],
+  ['importExport', 'Импорт / экспорт'],
+  ['glossary', 'Справочник'],
+];
+
 const store = new AppStore();
 const app = document.getElementById('app');
 const monthEditor = createMonthEditor({ store });
@@ -14,8 +22,9 @@ document.body.appendChild(monthEditor.element);
 
 function renderShell(state) {
   const latest = state.latestMetrics;
-  const warningCount = latest?.warnings.filter((item) => item.severity === 'error').length ?? 0;
+  const warningCount = state.metrics.reduce((acc, item) => acc + item.warnings.filter((w) => w.severity === 'error').length, 0);
   const activeSection = state.ui.activeSection;
+  const hasMonths = state.months.length > 0;
 
   app.innerHTML = `
     <div class="app-shell">
@@ -24,17 +33,11 @@ function renderShell(state) {
           <div class="brand__logo">IU</div>
           <div>
             <div class="brand__title">iUnitRadar</div>
-            <div class="brand__subtitle">Refactored unit economics calculator</div>
+            <div class="brand__subtitle">Unit economics для B2B SaaS</div>
           </div>
         </div>
         <nav class="nav">
-          ${[
-            ['dashboard', 'Dashboard'],
-            ['share', 'Share'],
-            ['months', 'Months'],
-            ['importExport', 'Import / Export'],
-            ['glossary', 'Glossary'],
-          ].map(([key, label]) => `
+          ${NAV_ITEMS.map(([key, label]) => `
             <button class="nav__button ${activeSection === key ? 'is-active' : ''}" data-section="${key}">
               <span>${label}</span>
               ${key === 'months' && warningCount > 0 ? `<span class="badge badge--danger">${warningCount}</span>` : ''}
@@ -42,7 +45,7 @@ function renderShell(state) {
           `).join('')}
         </nav>
         <div class="sidebar__footer footer-note">
-          Локальное сохранение остаётся для draft-режима, но shared link использует удалённый snapshot через Supabase.
+          Черновики хранятся локально. Ссылки на сценарии — через Supabase snapshot.
         </div>
       </aside>
       <main class="main">
@@ -50,52 +53,54 @@ function renderShell(state) {
           <section class="hero">
             <div class="hero__top">
               <div>
-                <h1>Unit Economics — B2B SaaS</h1>
+                <h1>Unit economics B2B SaaS</h1>
                 <p>
-                  Исходный production bundle был без source-кода, поэтому проект пересобран в поддерживаемую модульную структуру.
-                  Формулы вынесены в pure functions, форма отделена от расчётов, а для шаринга добавлен remote snapshot по ссылке.
+                  Соберите помесячные данные, проверьте качество входов и сравните retention, маржу и эффективность
+                  привлечения до решений по roadmap и бюджету.
                 </p>
               </div>
               <div class="hero__actions">
-                <button class="button button--primary" data-action="add-month">Добавить месяц</button>
-                <button class="button" data-action="share-save">Сохранить и поделиться</button>
-                <button class="button button--ghost" data-action="share-copy" ${state.ui.lastShareUrl ? '' : 'disabled'}>Скопировать ссылку</button>
+                ${!hasMonths ? '<button class="button button--primary" data-action="load-sample">Загрузить демо-сценарий</button>' : ''}
+                <button class="button ${hasMonths ? 'button--primary' : ''}" data-action="add-month">Добавить месяц</button>
+                ${hasMonths ? `
+                  <button class="button" data-action="share-save">Сохранить и поделиться</button>
+                  <button class="button button--ghost" data-action="share-copy" ${state.ui.lastShareUrl ? '' : 'disabled'}>Скопировать ссылку</button>
+                  <button class="button button--ghost" data-action="load-sample">Сбросить к демо</button>
+                ` : ''}
               </div>
             </div>
-            <div class="hero__meta">
-              <span class="meta-pill">${state.months.length} месяц(а/ев) в базе</span>
-              <span class="meta-pill">${latest ? `Latest MRR ${formatCurrency(latest.mrr, true)}` : 'Нет данных'}</span>
-              <span class="meta-pill">${latest ? `NRR ${formatPercent(latest.nrr, 1)}` : '—'}</span>
-              <span class="meta-pill">${state.ui.viewingSharedSnapshot ? `Shared mode: ${state.ui.activeRemoteId}` : 'Local draft mode'}</span>
-            </div>
+            ${hasMonths ? `
+              <div class="hero__meta">
+                <span class="meta-pill">${state.months.length} мес. в сценарии</span>
+                <span class="meta-pill">${latest ? `MRR ${formatCurrency(latest.mrr, true)}` : '—'}</span>
+                <span class="meta-pill">${latest ? `NRR ${formatPercent(latest.nrr, 1)}` : '—'}</span>
+                <span class="meta-pill">${state.ui.viewingSharedSnapshot ? `Shared: ${state.ui.activeRemoteId}` : 'Локальный черновик'}</span>
+              </div>
+            ` : ''}
           </section>
 
-          <div class="section-tabs">
-            ${[
-              ['dashboard', 'Dashboard'],
-              ['share', 'Share'],
-              ['months', 'Months'],
-              ['importExport', 'Import / Export'],
-              ['glossary', 'Glossary'],
-            ].map(([key, label]) => `<button class="button ${activeSection === key ? 'button--primary' : ''}" data-section="${key}">${label}</button>`).join('')}
+          <div class="section-tabs" aria-label="Навигация">
+            ${NAV_ITEMS.map(([key, label]) => `<button class="button ${activeSection === key ? 'button--primary' : ''}" data-section="${key}">${label}</button>`).join('')}
           </div>
 
-          <section class="status-banner">
-            <div class="status-banner__row">
-              <div>
-                <strong>${state.ui.remoteLoadState === 'loading' ? 'Загрузка shared snapshot…' : state.ui.shareStatus.message || 'Система готова к работе.'}</strong>
-                <div class="warning-item__message">
-                  ${state.ui.remoteLoadMessage || (state.selectedMetrics ? `Сейчас выбран ${formatMonth(state.selectedMetrics.month)}.` : 'Выберите месяц или создайте новый расчёт.')}
+          ${hasMonths ? `
+            <section class="status-banner">
+              <div class="status-banner__row">
+                <div>
+                  <strong>${state.ui.remoteLoadState === 'loading' ? 'Загрузка shared snapshot…' : state.ui.shareStatus.message || 'Готово к работе.'}</strong>
+                  <div class="warning-item__message">
+                    ${state.ui.remoteLoadMessage || (state.selectedMetrics ? `Выбран ${formatMonth(state.selectedMetrics.month)}.` : 'Выберите месяц или создайте новый расчёт.')}
+                  </div>
+                </div>
+                <div class="status-banner__actions">
+                  ${state.ui.viewingSharedSnapshot ? '<button class="button button--ghost" data-action="detach-shared">Создать локальную копию</button>' : ''}
+                  <button class="button" data-action="export-json">Экспорт JSON</button>
+                  <button class="button" data-action="export-csv">Экспорт CSV</button>
+                  <label class="button button--ghost">Импорт JSON<input class="hidden" type="file" accept=".json" data-action="import-json" /></label>
                 </div>
               </div>
-              <div class="status-banner__actions">
-                ${state.ui.viewingSharedSnapshot ? '<button class="button button--ghost" data-action="detach-shared">Создать локальную копию</button>' : ''}
-                <button class="button" data-action="export-json">Экспорт JSON</button>
-                <button class="button" data-action="export-csv">Экспорт CSV</button>
-                <label class="button button--ghost">Импорт JSON<input class="hidden" type="file" accept=".json" data-action="import-json" /></label>
-              </div>
-            </div>
-          </section>
+            </section>
+          ` : ''}
 
           ${activeSection === 'dashboard' ? renderDashboardOverview(state) : ''}
           ${activeSection === 'share' ? renderSharePanel(state) : ''}
@@ -113,6 +118,12 @@ function renderShell(state) {
 function bindEvents(state) {
   app.querySelectorAll('[data-section]').forEach((button) => {
     button.addEventListener('click', () => store.setActiveSection(button.dataset.section));
+  });
+
+  app.querySelector('[data-action="load-sample"]')?.addEventListener('click', () => {
+    if (state.months.length && !window.confirm('Текущие данные будут заменены демо-сценарием. Продолжить?')) return;
+    store.loadSampleScenario();
+    store.setShareStatus('success', 'Демо-сценарий загружен: 3 месяца B2B SaaS для селлеров маркетплейсов.');
   });
 
   app.querySelectorAll('[data-select-month]').forEach((row) => {
@@ -172,30 +183,18 @@ function bindEvents(state) {
     monthEditor.open(created);
   });
 
-  app.querySelector('[data-action="share-save"]')?.addEventListener('click', async () => {
-    await handleShareSave();
-  });
-  app.querySelector('[data-action="share-copy"]')?.addEventListener('click', async () => {
-    await handleShareCopy();
-  });
-  app.querySelector('[data-share-save]')?.addEventListener('click', async () => {
-    await handleShareSave();
-  });
-  app.querySelector('[data-share-copy]')?.addEventListener('click', async () => {
-    await handleShareCopy();
-  });
-
+  app.querySelector('[data-action="share-save"]')?.addEventListener('click', handleShareSave);
+  app.querySelector('[data-action="share-copy"]')?.addEventListener('click', handleShareCopy);
+  app.querySelector('[data-share-save]')?.addEventListener('click', handleShareSave);
+  app.querySelector('[data-share-copy]')?.addEventListener('click', handleShareCopy);
   app.querySelector('[data-action="detach-shared"]')?.addEventListener('click', detachSharedMode);
   app.querySelector('[data-share-detach]')?.addEventListener('click', detachSharedMode);
-
   app.querySelector('[data-action="export-json"]')?.addEventListener('click', exportJson);
   app.querySelector('[data-export-json]')?.addEventListener('click', exportJson);
   app.querySelector('[data-action="export-csv"]')?.addEventListener('click', exportCsv);
   app.querySelector('[data-export-csv]')?.addEventListener('click', exportCsv);
 
-  const importInputTop = app.querySelector('[data-action="import-json"]');
-  const importInputSection = app.querySelector('[data-import-file]');
-  [importInputTop, importInputSection].filter(Boolean).forEach((input) => {
+  [app.querySelector('[data-action="import-json"]'), app.querySelector('[data-import-file]')].filter(Boolean).forEach((input) => {
     input.addEventListener('change', async () => {
       await handleImport(input);
     });
@@ -233,7 +232,7 @@ async function handleImport(input) {
 
 async function handleShareSave() {
   try {
-    store.setShareStatus('loading', 'Сохраняю shared snapshot в remote storage…');
+    store.setShareStatus('loading', 'Сохраняю shared snapshot…');
     const result = await saveSharedCalculation(store);
     store.setShareInfo({
       lastShareUrl: result.shareUrl,
@@ -241,7 +240,7 @@ async function handleShareSave() {
       activeRemoteId: result.id,
       viewingSharedSnapshot: true,
     });
-    store.setShareStatus('success', 'Snapshot сохранён. Ссылку можно отправлять другому пользователю.');
+    store.setShareStatus('success', 'Snapshot сохранён. Ссылку можно отправлять коллегам.');
   } catch (error) {
     store.setShareStatus('error', error instanceof Error ? error.message : 'Не удалось сохранить shared snapshot.');
   }
@@ -261,7 +260,7 @@ async function handleShareCopy() {
 function detachSharedMode() {
   removeCalcIdFromUrl();
   store.clearSharedView();
-  store.setShareStatus('success', 'Shared mode выключен. Текущие данные остались локально как отдельная копия.');
+  store.setShareStatus('success', 'Shared mode выключен. Текущие данные остались локально.');
 }
 
 async function bootstrapRemoteSnapshot() {
@@ -277,8 +276,8 @@ async function bootstrapRemoteSnapshot() {
       lastShareUrl: window.location.href,
       lastSharedAt: snapshot.createdAt,
     });
-    store.setRemoteLoadState('success', `Shared snapshot ${snapshot.id} успешно загружен.`);
-    store.setShareStatus('success', 'Открыт shared snapshot. Вы видите тот же расчёт, что и автор ссылки.');
+    store.setRemoteLoadState('success', `Shared snapshot ${snapshot.id} загружен.`);
+    store.setShareStatus('success', 'Открыт shared snapshot — вы видите тот же расчёт, что и автор ссылки.');
   } catch (error) {
     store.setRemoteLoadState('error', error instanceof Error ? error.message : 'Не удалось загрузить shared snapshot.');
     store.setShareStatus('error', error instanceof Error ? error.message : 'Не удалось загрузить shared snapshot.');

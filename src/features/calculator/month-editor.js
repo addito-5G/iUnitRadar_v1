@@ -11,7 +11,7 @@ function createFieldMarkup(field, formValues, issues) {
         <span class="field__label">${label}</span>
         <div class="split">
           <input data-field="${key}" type="checkbox" ${formValues[key] ? 'checked' : ''} style="width:auto; margin-right:8px;" />
-          <span class="field__hint">Флажок нужен для быстрых sanity-check и совместного просмотра расчёта.</span>
+          <span class="field__hint">Для быстрых sanity-check и совместного просмотра расчёта.</span>
         </div>
         ${issue ? `<div class="${issue.severity === 'error' ? 'field__error' : 'field__info'}">${issue.message}</div>` : ''}
       </label>
@@ -94,11 +94,11 @@ export function createMonthEditor({ store }) {
       <div class="editor-panel__header">
         <div>
           <h2 class="editor-panel__title">Редактор месяца — ${draft.month || currentMonth.month}</h2>
-          <p class="section__description">Форма и доменные расчёты разделены: пока вы редактируете строки, приложение работает с нормализованным snapshot.</p>
+          <p class="section__description">Форма и расчёты разделены: редактируете входы — метрики пересчитываются централизованно.</p>
         </div>
         <div class="split">
           <button class="button button--ghost" data-action="close">Закрыть</button>
-          <button class="button button--primary" data-action="save">Сохранить изменения</button>
+          <button class="button button--primary" data-action="save">Сохранить</button>
         </div>
       </div>
       <div class="form-grid">
@@ -117,7 +117,7 @@ export function createMonthEditor({ store }) {
           <div class="section__header">
             <div>
               <h3 class="section__title">Live validation</h3>
-              <p class="section__description">Ошибки, warning и info считаются централизованно теми же pure-функциями, что и на дашборде.</p>
+              <p class="section__description">Ошибки, warnings и info считаются теми же pure-функциями, что и на дашборде.</p>
             </div>
             <span class="inline-pill">${issueList.length} сообщений</span>
           </div>

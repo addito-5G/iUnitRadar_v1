@@ -485,6 +485,43 @@ code {
   gap: 8px;
   flex-wrap: wrap;
 }
+.empty-state-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: 20px;
+  padding: 8px 0 12px;
+}
+.empty-state-hero__content {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.empty-state-hero__content h2 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.15;
+}
+.empty-state-hero__content p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 56ch;
+  line-height: 1.6;
+}
+.empty-state-hero__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.empty-state-hero__card {
+  align-self: start;
+}
+.glossary-item__assumption {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.18);
+}
 .empty-state {
   padding: 42px 24px;
   text-align: center;
@@ -589,6 +626,9 @@ code {
   }
   .section-tabs {
     display: flex;
+  }
+  .empty-state-hero {
+    grid-template-columns: 1fr;
   }
   .main {
     padding: 16px;

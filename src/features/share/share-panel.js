@@ -13,12 +13,23 @@ export function renderSharePanel(state) {
         ? 'badge--warning'
         : 'badge--neutral';
 
+  if (!state.months.length) {
+    return `
+      <section class="section-card">
+        <div class="empty-state">
+          <strong>Сначала нужен сценарий</strong>
+          Загрузите демо или добавьте месяц — после этого можно сохранить snapshot и поделиться ссылкой.
+        </div>
+      </section>
+    `;
+  }
+
   return `
     <section class="section-card">
       <div class="section__header">
         <div>
           <h2 class="section__title">Поделиться расчётом</h2>
-          <p class="section__description">Shared-link сохраняет удалённый snapshot всех входных данных и конфигурации калькулятора. На другом устройстве откроются те же данные и тот же результат.</p>
+          <p class="section__description">Ссылка сохраняет remote snapshot всех входных данных и настроек. На другом устройстве откроется тот же сценарий.</p>
         </div>
         <span class="badge ${shareStatusBadgeClass}">${shareStatus.type === 'idle' ? 'готово' : shareStatus.type}</span>
       </div>
@@ -28,8 +39,8 @@ export function renderSharePanel(state) {
             <div class="share-list">
               <li><strong>Remote storage:</strong> ${remoteConfigured ? 'настроен' : 'не настроен'}</li>
               <li><strong>Последнее сохранение:</strong> ${state.ui.lastSharedAt ? new Date(state.ui.lastSharedAt).toLocaleString('ru-RU') : 'ещё не было'}</li>
-              <li><strong>В shared payload попадёт:</strong> ${state.months.length} месяц(а/ев), thresholds, activation config и selected month.</li>
-              ${state.ui.viewingSharedSnapshot ? `<li><strong>Режим просмотра:</strong> открыт shared snapshot <code>${state.ui.activeRemoteId}</code></li>` : ''}
+              <li><strong>В snapshot попадёт:</strong> ${state.months.length} мес., thresholds, activation config, выбранный месяц.</li>
+              ${state.ui.viewingSharedSnapshot ? `<li><strong>Режим просмотра:</strong> shared snapshot <code>${state.ui.activeRemoteId}</code></li>` : ''}
             </div>
             <div class="split">
               <button class="button button--primary" data-share-save ${remoteConfigured ? '' : 'disabled'}>Сохранить и получить ссылку</button>
@@ -37,14 +48,15 @@ export function renderSharePanel(state) {
               ${state.ui.viewingSharedSnapshot ? '<button class="button button--ghost" data-share-detach>Создать локальную копию</button>' : ''}
             </div>
             <div class="share-link">
-              <div class="share-link__value">${state.ui.lastShareUrl || 'Пока ссылка не создана.'}</div>
+              <div class="share-link__value">${state.ui.lastShareUrl || 'Ссылка ещё не создана.'}</div>
             </div>
             ${shareStatus.message ? `<div class="warning-item__message">${shareStatus.message}</div>` : ''}
-            ${!remoteConfigured ? '<div class="field__hint">Чтобы включить шаринг, заполните <code>config.js</code> значениями Supabase.</div>' : ''}
+            ${!remoteConfigured ? '<div class="field__hint">Для шаринга заполните <code>config.js</code> данными Supabase.</div>' : ''}
+            <div class="field__hint">Демо-режим: RLS в Supabase открыт для anon. Не используйте production-ключи с чувствительными данными.</div>
           </div>
         </div>
         <div class="card">
-          <h3 class="section__title" style="font-size:18px;">Snapshot preview</h3>
+          <h3 class="section__title" style="font-size:18px;">Превью snapshot</h3>
           ${selected ? `
             <table class="summary-table">
               <tbody>

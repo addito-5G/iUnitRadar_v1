@@ -1,14 +1,39 @@
 import { formatCurrency, formatGrowthDelta, formatMonth, formatMonthShort, formatNumber, formatPercent } from '../../lib/formatters.js';
-import { GLOSSARY } from './glossary.js';
+import { GLOSSARY, METHODOLOGY_NOTE } from './glossary.js';
+
+function renderEmptyDashboard() {
+  return `
+    <section class="empty-state-hero">
+      <div class="empty-state-hero__content">
+        <span class="badge badge--neutral">Демо B2B SaaS · маркетплейсы РФ</span>
+        <h2>Начните с готового сценария</h2>
+        <p>
+          Три месяца реалистичных данных: MRR, NRR, CAC, gross margin, health score и валидация входов.
+          Подходит, чтобы быстро показать логику калькулятора или проверить гипотезу по unit economics.
+        </p>
+        <div class="empty-state-hero__actions">
+          <button class="button button--primary" data-action="load-sample">Загрузить демо-сценарий</button>
+          <button class="button button--ghost" data-action="add-month">Создать пустой месяц</button>
+        </div>
+      </div>
+      <div class="empty-state-hero__card card">
+        <h3 class="section__title" style="font-size:18px;">Что внутри демо</h3>
+        <div class="meta-list">
+          <li>Сентябрь — запуск когорты партнёров Wildberries</li>
+          <li>Октябрь — рост GMV, первые клиенты Ozon</li>
+          <li>Ноябрь — предсезонный рост и крупные кабинеты</li>
+        </div>
+      </div>
+    </section>
+  `;
+}
 
 function renderKpis(metrics) {
-  if (!metrics) {
-    return '<div class="empty-state"><strong>Нет рассчитанных метрик</strong>Добавьте хотя бы один месяц, чтобы увидеть dashboard.</div>';
-  }
+  if (!metrics) return '';
 
   const items = [
     ['MRR', formatCurrency(metrics.mrr, true), formatGrowthDelta(metrics.mrrGrowthPct), 'Конечный recurring revenue за месяц.'],
-    ['NRR', formatPercent(metrics.nrr), 'Удержание выручки по существующей базе.', 'Главная retention-метрика для B2B SaaS.'],
+    ['NRR', formatPercent(metrics.nrr), 'Удержание выручки по существующей базе.', 'Ключевая retention-метрика B2B SaaS.'],
     ['Gross Margin', formatPercent(metrics.grossMarginPct), `COGS ${formatCurrency(metrics.totalCOGS, true)}`, 'Маржа после infra и delivery cost.'],
     ['LTV:CAC', `${formatNumber(metrics.ltvCacRatio, 1)}×`, `Payback ${formatNumber(metrics.paybackMonths, 1)} мес`, 'Эффективность unit economics.'],
   ];
@@ -86,8 +111,8 @@ function renderHealth(metrics) {
     <section class="section-card">
       <div class="section__header">
         <div>
-          <h2 class="section__title">Health flags и предупреждения</h2>
-          <p class="section__description">Сигналы рассчитываются централизованно по threshold-профилю и не зависят от UI.</p>
+          <h2 class="section__title">Health flags и валидация</h2>
+          <p class="section__description">Сигналы считаются централизованно по порогам и не зависят от UI.</p>
         </div>
       </div>
       <div class="health-grid">
@@ -115,6 +140,10 @@ function renderHealth(metrics) {
 }
 
 export function renderDashboardOverview(state) {
+  if (!state.months.length) {
+    return `<section class="section">${renderEmptyDashboard()}</section>`;
+  }
+
   const selected = state.selectedMetrics;
   return `
     <section class="section">
@@ -125,7 +154,7 @@ export function renderDashboardOverview(state) {
         <div class="section__header">
           <div>
             <h2 class="section__title">Timeline</h2>
-            <p class="section__description">Быстрое чтение тренда по месяцам.</p>
+            <p class="section__description">Динамика по месяцам в одной таблице.</p>
           </div>
         </div>
         <div class="table-shell">
@@ -163,7 +192,7 @@ export function renderDashboardOverview(state) {
 
 export function renderMonthsManager(state) {
   if (!state.months.length) {
-    return '<div class="empty-state"><strong>Нет данных по месяцам</strong>Добавьте первый месяц и начните строить калькулятор.</div>';
+    return renderEmptyDashboard();
   }
   const metricMap = new Map(state.metrics.map((item) => [item.monthId, item]));
   return `
@@ -171,7 +200,7 @@ export function renderMonthsManager(state) {
       <div class="section__header">
         <div>
           <h2 class="section__title">Данные по месяцам</h2>
-          <p class="section__description">Редактирование идёт через form state, а расчёты и warnings обновляются через нормализованный слой.</p>
+          <p class="section__description">Редактирование формы отделено от расчётов и предупреждений.</p>
         </div>
       </div>
       <div class="table-shell">
@@ -184,7 +213,7 @@ export function renderMonthsManager(state) {
               <th class="table__cell--numeric">NRR</th>
               <th class="table__cell--numeric">Gross Margin</th>
               <th class="table__cell--numeric">Health</th>
-              <th class="table__cell--numeric">Actions</th>
+              <th class="table__cell--numeric">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -204,9 +233,9 @@ export function renderMonthsManager(state) {
                   <td class="table__cell--numeric">${metrics ? metrics.healthScore : '—'}</td>
                   <td class="table__cell--numeric">
                     <div class="table__actions">
-                      <button class="button button--ghost" data-edit-month="${month.id}">Edit</button>
-                      <button class="button button--ghost" data-duplicate-month="${month.id}" data-duplicate-from="${month.month}">Copy</button>
-                      <button class="button button--danger" data-delete-month="${month.id}" data-delete-name="${month.month}">Delete</button>
+                      <button class="button button--ghost" data-edit-month="${month.id}">Изменить</button>
+                      <button class="button button--ghost" data-duplicate-month="${month.id}" data-duplicate-from="${month.month}">Копия</button>
+                      <button class="button button--danger" data-delete-month="${month.id}" data-delete-name="${month.month}">Удалить</button>
                     </div>
                   </td>
                 </tr>
@@ -225,14 +254,14 @@ export function renderImportExportSection(state) {
       <div class="section__header">
         <div>
           <h2 class="section__title">Импорт / экспорт</h2>
-          <p class="section__description">JSON сохраняет весь snapshot, CSV отдаёт входные поля для Excel / BI.</p>
+          <p class="section__description">JSON сохраняет полный snapshot, CSV — входные поля для Excel / BI.</p>
         </div>
       </div>
       <div class="share-grid">
         <div class="card">
           <div class="share-box">
             <div class="meta-list">
-              <li>В базе сейчас <strong>${state.months.length}</strong> месяц(а/ев).</li>
+              <li>В сценарии сейчас <strong>${state.months.length}</strong> мес.</li>
               <li>JSON включает thresholds, activation config и выбранный месяц.</li>
               <li>CSV включает только входные поля без derived metrics.</li>
             </div>
@@ -247,11 +276,11 @@ export function renderImportExportSection(state) {
           </div>
         </div>
         <div class="card">
-          <h3 class="section__title" style="font-size:18px;">Почему layered storage</h3>
+          <h3 class="section__title" style="font-size:18px;">Хранение данных</h3>
           <div class="meta-list">
-            <li><strong>Local draft</strong> остаётся для скорости и оффлайн-поведения.</li>
-            <li><strong>Remote snapshot</strong> используется только для надёжного шаринга по ссылке.</li>
-            <li><strong>Payload versioning</strong> даёт точку для будущих миграций схемы.</li>
+            <li><strong>Локальный черновик</strong> — быстрое редактирование и офлайн.</li>
+            <li><strong>Remote snapshot</strong> — надёжный шаринг по ссылке.</li>
+            <li><strong>Версионирование payload</strong> — задел под миграции схемы.</li>
           </div>
         </div>
       </div>
@@ -265,19 +294,20 @@ export function renderGlossarySection() {
       <div class="section__header">
         <div>
           <h2 class="section__title">Справочник метрик</h2>
-          <p class="section__description">Ключевые формулы вынесены в отдельный слой и описаны для удобства команды.</p>
+          <p class="section__description">${METHODOLOGY_NOTE}</p>
         </div>
       </div>
       <div class="glossary-list">
         ${GLOSSARY.map((item) => `
           <article class="glossary-item">
             <div class="glossary-item__top">
-              <strong>${item.nameRu}</strong>
-              <span class="badge badge--neutral">${item.nameEn}</span>
+              <strong>${item.name}</strong>
+              <span class="badge badge--neutral">${item.category}</span>
             </div>
             <div class="warning-item__message">${item.definition}</div>
             <code>${item.formula}</code>
             <div class="warning-item__message">${item.interpretation}</div>
+            ${item.assumption ? `<div class="field__hint glossary-item__assumption">${item.assumption}</div>` : ''}
           </article>
         `).join('')}
       </div>
