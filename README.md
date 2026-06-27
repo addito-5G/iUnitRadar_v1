@@ -36,6 +36,21 @@ Built the way a PM uses product analytics in practice: turn monthly inputs into 
 
 Sharing works only when Supabase is configured. Everything else runs offline with local storage.
 
+## Deploy (GitHub Pages)
+
+The workflow runs tests, then publishes the site to the **`gh-pages`** branch (via `peaceiris/actions-gh-pages`).
+
+**One-time repo setting:**
+
+1. Open **Settings → Pages**
+2. **Build and deployment → Source:** `Deploy from a branch`
+3. **Branch:** `gh-pages` / `/ (root)`
+4. Save
+
+After the first successful workflow run, the `gh-pages` branch is created automatically.
+
+> We use branch-based Pages deploy instead of the `github-pages` environment to avoid stale branch restrictions from older setup (`refactor-unit-calculator`).
+
 ## Security note (Supabase)
 
 The bundled `schema.sql` enables **public read/write for anonymous users** — intentional for a demo/portfolio deployment.
